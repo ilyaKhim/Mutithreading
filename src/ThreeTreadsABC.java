@@ -1,3 +1,7 @@
+/*1. Создать три потока, каждый из которых выводит определенную букву (A, B и C) 5 раз
+        (порядок – ABСABСABС).
+        */
+
 public class ThreeTreadsABC {
     private volatile char currentChar = 'A';
 
