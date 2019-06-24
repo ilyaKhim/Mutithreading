@@ -1,67 +1,76 @@
-/*1. Создать три потока, каждый из которых выводит определенную букву (A, B и C) 5 раз
-        (порядок – ABСABСABС).
-        */
-
 public class ThreeTreadsABC {
-    private volatile char currentChar = 'A';
 
     public static void main(String[] args) {
         ThreeTreadsABC test = new ThreeTreadsABC();
-        new Thread(test::printA).start();
-        new Thread(test::printB).start();
-        new Thread(test::printC).start();
 
-    }
-    public void printA(){
-        synchronized (this){
-            for (int i = 0; i <5 ; i++) {
-                if(currentChar != 'A') {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                System.out.println("A");
-                currentChar = 'B';
-                notify();
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                test.printA();
             }
-        }
+        });
+        t1.start();
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                test.printB();
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                test.printC();
+            }
+        }).start();
+
+
+
     }
 
-    public void printB(){
-        synchronized (this){
-            for (int i = 0; i <5 ; i++) {
-                if(currentChar != 'B') {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
+    public volatile char currentLetter = 'A';
+
+    public synchronized void  printA(){
+
+            try {
+                for (int i = 0; i<5; i++){
+                    while(currentLetter != 'A') wait();
+                    System.out.println("A");
+                    currentLetter = 'B';
+                    notify();
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+    }
+
+    public synchronized void printB(){
+        try {
+            for (int i = 0; i<5; i++){
+                while (currentLetter != 'B') wait();
                 System.out.println("B");
-                currentChar = 'C';
+                currentLetter = 'C';
                 notify();
             }
+        } catch (InterruptedException e){
+            e.printStackTrace();
         }
     }
 
-    public void printC(){
-        synchronized (this){
-            for (int i = 0; i <5 ; i++) {
-                if(currentChar != 'C') {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                System.out.println("C");
-                currentChar = 'A';
-                notify();
+    public synchronized void printC(){
+        try{
+            for(int i = 0; i< 5; i++){
+                while (currentLetter != 'C') wait();
+                System.out.println('C');
+                currentLetter = 'A';
+                notifyAll();
             }
+        }catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
-
-
 }
